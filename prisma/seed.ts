@@ -5,6 +5,9 @@ import Database from "better-sqlite3";
 import "dotenv/config";
 
 const db = new Database("./prisma/dev.db");
+
+// @ts-expect-error there is an error here due
+// to having to patch @prisma/adapter-better-sqlite3 manually
 const adapter = new PrismaBetterSqlite3(db);
 
 const prisma = new PrismaClient({ adapter });
