@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Install the dependencies through a node package manager, for example npm, pnpm.
+
+```
+npm install
+```
+
 First, run the development server:
 
 ```bash
@@ -16,13 +22,75 @@ bun dev
 
 ## Local Env
 
-This project uses auth0 as it's authentication provider. To run it locally, you must create your own `.env.local` file. See the example in `.example.env` or at `https://auth0.com/docs/quickstart/webapp/nextjs#dashboard` for further examples.
+This project uses auth0 as it's authentication provider. To run it locally, you must create your own `.env.local` file.
+See the example in `.example.env` or at `https://auth0.com/docs/quickstart/webapp/nextjs#dashboard` for further examples.
+
+Make sure your Auth0 application is configured with:
+
+- Allowed Callback URLs
+
+- Allowed Logout URLs
+
+- Allowed Web Origins
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Setting up Prisma and Sqlite
+
+This project uses Prisma with SQLite and better-sqlite3.
+
+### Requirements
+
+    - Node.js20 (LTS)
+        - Node 24 is currently unsupported by better-sqlite3
+    - Prisma 7.3.0 (apply workaround)
+
+### Prisma first steps
+
+```
+npx prisma generate
+
+npx prisma migrate dev --name init
+
+npx tsx prisma/seed.ts
+
+```
+
+## Prisma 7.3.0 workaround
+
+According to [Issue #29074](https://github.com/prisma/prisma/issues/29074) in prisma, there is an issue with @prisma/adapter-better-sqlite3 package, that doesn't let you run migrations. To fix this, follow the workaround in the ticket, and manually apply the code in the createBetterSQLite3Client function (node_modules/@prisma/adapter-better-sqlite3/dist/index.mjs).
+
+```
+ const dbPath = "/path/to/your/db_file/dev.db"
+```
+
+```
+ const db = new import_better_sqlite3.default(dbPath);
+```
+
+You have to hardcode the path to your sqlite db, and remove the `input` property form the Database constructor
+
+## Prisma cheat sheet
+
+```
+# Reset database and migrations (DANGEROUS: deletes all data)
+npx prisma migrate reset
+
+# Open Prisma Studio
+npx prisma studio
+
+# Generate Prisma Client
+npx prisma generate
+
+# Create a migration
+npx prisma migrate dev --name <migration-name>
+
+# Seed database
+npx tsx prisma/seed.ts
 ## Learn More
+```
 
 To learn more about Next.js, take a look at the following resources:
 
