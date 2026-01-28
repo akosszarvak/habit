@@ -58,6 +58,12 @@ npx tsx prisma/seed.ts
 
 ```
 
+To see your database, you can use Prisma Studio and navigate to `http://localhost:51212/`
+
+```
+npx prisma studio
+```
+
 ## Prisma 7.3.0 workaround
 
 According to [Issue #29074](https://github.com/prisma/prisma/issues/29074) in prisma, there is an issue with @prisma/adapter-better-sqlite3 package, that doesn't let you run migrations. To fix this, follow the workaround in the ticket, and manually apply the code in the createBetterSQLite3Client function (node_modules/@prisma/adapter-better-sqlite3/dist/index.mjs).
