@@ -32,6 +32,7 @@ export async function GET() {
   }
 }
 
+//POST /api/habits - create a habit
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUser();
