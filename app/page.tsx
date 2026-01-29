@@ -16,10 +16,10 @@ export default async function Home() {
         <h1 className="text-4xl font-bold text-gray-900">Habit Tracker</h1>
         <p className="text-gray-600">Build better habits, one day at a time</p>
         <div className="flex gap-4 justify-center">
-          <Link href="/api/auth/login?screen_hint=signup">
+          <Link href="/api/login?screen_hint=signup">
             <Button size="lg">Sign up</Button>
           </Link>
-          <Link href="/api/auth/login">
+          <Link href="/auth/login">
             <Button size="lg" variant="outline">
               Log in
             </Button>
