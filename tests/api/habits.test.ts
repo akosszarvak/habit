@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { testPrisma } from "../setup";
+
 import "../mocks/prisma";
 
 const mockUser = {
@@ -11,6 +11,8 @@ const mockGetAuthenticatedUser = vi.fn();
 vi.mock("../../lib/utils/auth", () => ({
   getAuthenticatedUser: mockGetAuthenticatedUser,
 }));
+
+const { testPrisma } = await import("../setup");
 
 vi.mock("../../lib/db", () => ({
   default: testPrisma,

@@ -30,13 +30,6 @@ beforeAll(async () => {
   }
 });
 
-// beforeEach(async () => {
-//   // Clear database before each test
-//   await testPrisma.completion.deleteMany();
-//   await testPrisma.habit.deleteMany();
-//   await testPrisma.user.deleteMany();
-// });
-
 afterAll(async () => {
   await testPrisma.$disconnect();
   db.close();
