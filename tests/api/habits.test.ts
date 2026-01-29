@@ -38,4 +38,33 @@ describe("GET /api/habits", () => {
     expect(response.status).toBe(401);
     expect(data.error).toBe("Unauthorized");
   });
+
+  it("should return empty array if user has no habits", async () => {
+    await testPrisma.user.create({ data: mockUser });
+    mockGetAuthenticatedUser.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.habits).toEqual([]);
+  });
+
+  it("should return all habits for authenticated user", async () => {
+    await testPrisma.user.create({ data: mockUser });
+    await testPrisma.habit.createMany({
+      data: [
+        { name: "Exercise", userId: mockUser.id },
+        { name: "Read", userId: mockUser.id },
+      ],
+    });
+
+    mockGetAuthenticatedUser.mockResolvedValue(mockUser);
+
+    const response = await GET();
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.habits).toHaveLength(2);
+  });
 });
