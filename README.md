@@ -1,14 +1,55 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Please refer to the Getting Started, Local Env and Known Issues sections to run the project.
+
+## Features
+
+- Create and manage daily habits with a clean, minimal interface
+
+- Track completion status day by dy
+
+- Persist data locally using SQLite
+
+- Built on Next.js, so you get api routes, server-side rendering and a smooth developer experience
+
+## Tech Stack
+
+- Next.js
+
+- SQLite
+
+- TypeScript
+
+- TailwindCSS and Shadcn
+
 ## Getting Started
 
-Install the dependencies through a node package manager, for example npm, pnpm.
+1. Clone the repository
+
+```
+git clone https://github.com/akosszarvak/habit.git
+cd habit
+
+```
+
+2. Install the dependencies through a node package manager, for example npm, pnpm.
 
 ```
 npm install
 ```
 
-First, run the development server:
+3. Run database migrations or initialize SQLite:
+
+```
+npx prisma generate
+
+npx prisma migrate dev --name init
+
+npx tsx prisma/seed.ts
+
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -18,6 +59,13 @@ yarn dev
 pnpm dev
 # or
 bun dev
+```
+
+5. Open the app in your browser at:
+
+```
+http://localhost:3000
+
 ```
 
 ## Local Env
@@ -64,7 +112,9 @@ To see your database, you can use Prisma Studio and navigate to `http://localhos
 npx prisma studio
 ```
 
-## Prisma 7.3.0 workaround
+## Known issues
+
+### Prisma 7.3.0 workaround
 
 According to [Issue #29074](https://github.com/prisma/prisma/issues/29074) in prisma, there is an issue with @prisma/adapter-better-sqlite3 package, that doesn't let you run migrations. To fix this, follow the workaround in the ticket, and manually apply the code in the createBetterSQLite3Client function (node_modules/@prisma/adapter-better-sqlite3/dist/index.mjs).
 
@@ -77,6 +127,28 @@ According to [Issue #29074](https://github.com/prisma/prisma/issues/29074) in pr
 ```
 
 You have to hardcode the path to your sqlite db, and remove the `input` property form the Database constructor
+
+## Project Structure
+
+This project follows the standard Next.js App Router structure with Prisma for database handling
+
+# Core App structure
+
+- `app/` – Next.js app router with pages and API routes
+  - `api/` – Backend API handlers for habit CRUD operations
+- `components/` – All custom UI elements
+- `components/ui/` – Shadcn/UI reusable components
+- `lib/` – Utilities and third-party integrations
+- `prisma/` – Database schema and Prisma configuration
+
+## How to Contribute
+
+Contributions are welcome!
+
+- Open an issue first if you want to add a new feature or make a larger change.
+- Fork the repo and create a feature branch for your changes.
+- Keep pull requests small and focused, and explain what you changed in the PR description.
+- Make sure the app builds and tests (if any) pass before opening a PR.
 
 ## Prisma cheat sheet
 
@@ -110,3 +182,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## License
+
+This project is licensed under the MIT License – see the LICENSE file for details.
