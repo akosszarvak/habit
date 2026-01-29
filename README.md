@@ -128,6 +128,19 @@ According to [Issue #29074](https://github.com/prisma/prisma/issues/29074) in pr
 
 You have to hardcode the path to your sqlite db, and remove the `input` property form the Database constructor
 
+## Project Structure
+
+This project follows the standard Next.js App Router structure with Prisma for database handling
+
+# Core App structure
+
+- `app/` – Next.js app router with pages and API routes
+  - `api/` – Backend API handlers for habit CRUD operations
+- `components/` – All custom UI elements
+- `components/ui/` – Shadcn/UI reusable components
+- `lib/` – Utilities and third-party integrations
+- `prisma/` – Database schema and Prisma configuration
+
 ## How to Contribute
 
 Contributions are welcome!
@@ -169,3 +182,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## License
+
+This project is licensed under the MIT License – see the LICENSE file for details.
