@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, CheckCircle2, Circle } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle2,
+  Circle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { isToday, isYesterday, format } from "date-fns";
 
 type Completion = {
   id: string;
@@ -24,6 +32,7 @@ export default function HabitDashboard() {
   const [newHabitName, setNewHabitName] = useState("");
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Fetch habits on mount
   useEffect(() => {
@@ -83,10 +92,12 @@ export default function HabitDashboard() {
 
   const toggleCompletion = async (habitId: string) => {
     try {
+      const dateString = selectedDate.toISOString().split("T")[0];
+
       const res = await fetch(`/api/completion/${habitId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Uses today's date by default
+        body: JSON.stringify({ date: dateString }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -95,15 +106,17 @@ export default function HabitDashboard() {
           habits.map((habit) => {
             if (habit.id !== habitId) return habit;
 
-            const today = new Date().toISOString().split("T")[0];
-
             if (data.completed) {
               // Add completion
               return {
                 ...habit,
                 completions: [
                   ...habit.completions,
-                  { id: data.completion.id, date: new Date(), habitId },
+                  {
+                    id: data.completion.id,
+                    date: new Date(dateString),
+                    habitId,
+                  },
                 ],
               };
             } else {
@@ -111,7 +124,8 @@ export default function HabitDashboard() {
               return {
                 ...habit,
                 completions: habit.completions.filter(
-                  (c) => new Date(c.date).toISOString().split("T")[0] !== today,
+                  (c) =>
+                    new Date(c.date).toISOString().split("T")[0] !== dateString,
                 ),
               };
             }
@@ -123,11 +137,39 @@ export default function HabitDashboard() {
     }
   };
 
-  const isCompletedToday = (habit: Habit) => {
-    const today = new Date().toISOString().split("T")[0];
+  const isCompletedToday = (habit: Habit, date: Date) => {
+    const dateString = date.toISOString().split("T")[0];
     return habit.completions.some(
-      (c) => new Date(c.date).toISOString().split("T")[0] === today,
+      (c) => new Date(c.date).toISOString().split("T")[0] === dateString,
     );
+  };
+
+  const goToPreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const goToToday = () => {
+    setSelectedDate(new Date());
+  };
+  const formatDate = (date: Date) => {
+    if (isToday()) return "Today";
+    if (isYesterday(date)) return "Yesterday";
+
+    return format(date, "EEE, MMM d");
+  };
+
+  const isToday = () => {
+    const today = new Date().toISOString().split("T")[0];
+    const selected = selectedDate.toISOString().split("T")[0];
+    return today === selected;
   };
 
   if (loading) {
@@ -139,6 +181,39 @@ export default function HabitDashboard() {
   }
   return (
     <div className="space-y-6">
+      {/* date selector */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToPreviousDay}
+            className="hover:bg-gray-100"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-semibold text-gray-900">
+              {formatDate(selectedDate)}
+            </span>
+            {!isToday() && (
+              <Button variant="outline" size="sm" onClick={goToToday}>
+                Today
+              </Button>
+            )}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToNextDay}
+            className="hover:bg-gray-100"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </Button>
+        </div>
+      </Card>
       {/* add habit form */}
       <Card className="p-4">
         <form onSubmit={addHabit} className="flex gap-2">
@@ -167,12 +242,16 @@ export default function HabitDashboard() {
       ) : (
         <div className="space-y-3">
           {habits.map((habit) => {
-            const completedToday = isCompletedToday(habit);
+            const completedOnSelectedDate = isCompletedToday(
+              habit,
+              selectedDate,
+            );
+
             return (
               <Card
                 key={habit.id}
                 className={`p-4 transition-all ${
-                  completedToday ? "bg-green-50 border-green-200" : ""
+                  completedOnSelectedDate ? "bg-green-50 border-green-200" : ""
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -181,7 +260,7 @@ export default function HabitDashboard() {
                       onClick={() => toggleCompletion(habit.id)}
                       className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
                     >
-                      {completedToday ? (
+                      {completedOnSelectedDate ? (
                         <CheckCircle2 className="w-8 h-8 text-green-600" />
                       ) : (
                         <Circle className="w-8 h-8 text-gray-300 hover:text-gray-400" />
@@ -189,7 +268,7 @@ export default function HabitDashboard() {
                     </button>
                     <span
                       className={`text-lg ${
-                        completedToday
+                        completedOnSelectedDate
                           ? "text-green-900 font-medium"
                           : "text-gray-700"
                       }`}
