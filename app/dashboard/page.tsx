@@ -19,7 +19,7 @@ export default async function DashboardPage() {
               Welcome, {session.user.name}
             </h1>
             <p className="text-gray-600">Track your daily habits</p>
-            <Link href="/api/auth/logout">
+            <Link href="/auth/logout">
               <Button variant="outline">Log out</Button>
             </Link>
           </div>
