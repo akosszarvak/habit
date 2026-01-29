@@ -81,6 +81,48 @@ export default function HabitDashboard() {
     }
   };
 
+  const toggleCompletion = async (habitId: string) => {
+    try {
+      const res = await fetch(`/api/completion/${habitId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}), // Uses today's date by default
+      });
+      if (res.ok) {
+        const data = await res.json();
+
+        setHabits(
+          habits.map((habit) => {
+            if (habit.id !== habitId) return habit;
+
+            const today = new Date().toISOString().split("T")[0];
+
+            if (data.completed) {
+              // Add completion
+              return {
+                ...habit,
+                completions: [
+                  ...habit.completions,
+                  { id: data.completion.id, date: new Date(), habitId },
+                ],
+              };
+            } else {
+              // Remove completion
+              return {
+                ...habit,
+                completions: habit.completions.filter(
+                  (c) => new Date(c.date).toISOString().split("T")[0] !== today,
+                ),
+              };
+            }
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle completion:", error);
+    }
+  };
+
   const isCompletedToday = (habit: Habit) => {
     const today = new Date().toISOString().split("T")[0];
     return habit.completions.some(
@@ -127,9 +169,43 @@ export default function HabitDashboard() {
           {habits.map((habit) => {
             const completedToday = isCompletedToday(habit);
             return (
-              <Card>
-                {habit.name}{" "}
-                {completedToday ? "completed" : "not completed"}{" "}
+              <Card
+                key={habit.id}
+                className={`p-4 transition-all ${
+                  completedToday ? "bg-green-50 border-green-200" : ""
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1">
+                    <button
+                      onClick={() => toggleCompletion(habit.id)}
+                      className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
+                    >
+                      {completedToday ? (
+                        <CheckCircle2 className="w-8 h-8 text-green-600" />
+                      ) : (
+                        <Circle className="w-8 h-8 text-gray-300 hover:text-gray-400" />
+                      )}
+                    </button>
+                    <span
+                      className={`text-lg ${
+                        completedToday
+                          ? "text-green-900 font-medium"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {habit.name}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteHabit(habit.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </Card>
             );
           })}
